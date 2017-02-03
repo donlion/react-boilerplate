@@ -14,6 +14,7 @@ import sass from 'gulp-sass';
 import runSequence from 'run-sequence';
 import eslint from 'gulp-eslint';
 import merge from 'merge-stream';
+import renderReact from 'gulp-render-react';
 
 /**
  * @name PATHS
@@ -38,7 +39,7 @@ const SCRIPTS = {
  * @type {{src, dist: *}}
  */
 const SERVER = {
-    src: path.join(PATHS.src, 'server/*.html'),
+    src: path.join(PATHS.src, 'server/*.js'),
     dist: PATHS.dist
 };
 
@@ -110,10 +111,13 @@ gulp.task('scripts:watch', () => {
 });
 
 /**
- * @name markup
+ * @name static
  */
-gulp.task('markup', () => {
-    return gulp.src(SERVER.src)
+gulp.task('static', () => {
+    return gulp.src(SERVER.src, {read:false})
+        .pipe(renderReact({
+            type: 'string'
+        }))
         .pipe(gulp.dest(SERVER.dist))
         .pipe(connect.reload());
 });
@@ -147,7 +151,7 @@ gulp.task('server', () => {
  */
 gulp.task('watch', ['build'], () => {
     runSequence(['server', 'scripts:watch']);
-    gulp.watch(SERVER.src, ['markup']);
+    gulp.watch(SERVER.src, ['static']);
     gulp.watch(STYLES.src, ['styles']);
 });
 
@@ -155,5 +159,5 @@ gulp.task('watch', ['build'], () => {
  * @name build
  */
 gulp.task('build', ['clean'], () => {
-    runSequence(['markup', 'styles']);
+    runSequence(['static', 'styles']);
 });
