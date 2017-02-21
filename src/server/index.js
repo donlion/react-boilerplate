@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
-
+// Components
 import App from '../scripts/components/App';
+
+global.navigator = global.navigator || {};
+global.navigator.userAgent = global.navigator.userAgent || 'all';
 
 export default class Document extends Component {
     render() {
@@ -8,7 +11,8 @@ export default class Document extends Component {
             <html lang="en">
             <head>
                 <meta charSet="UTF-8" />
-                <title>Future Finance</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>React boilerplate</title>
                 <link rel="stylesheet" href="/css/app.css" />
             </head>
             <body>
