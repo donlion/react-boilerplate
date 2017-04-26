@@ -1,27 +1,32 @@
-import React, {Component} from 'react';
+import express from 'express';
+import React, {Component} from 'react';
+import {renderToString} from 'react-dom/server';
 // Components
-import App from '../scripts/components/App';
+import Root from '../scripts/components/Root';
 
-global.navigator = global.navigator || {};
-global.navigator.userAgent = global.navigator.userAgent || 'all';
+export const start = () => {
+  const app = express();
 
-export default class Document extends Component {
-    render() {
-        return (
-            <html lang="en">
-            <head>
-                <meta charSet="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
-                <title>React boilerplate</title>
-                <link rel="stylesheet" href="/css/app.css" />
-            </head>
-            <body>
-            <div id="root">
-                <App />
-            </div>
-            <script src="/js/app.js" defer="defer" type="text/javascript"></script>
-            </body>
-            </html>
-        );
-    }
-}
+  let redirectToDev = (req, res) => {
+    res.redirect(`http://localhost:8080/${req.params.path}/${req.params.file}`);
+  };
+
+  // Dev
+  app.use(require('connect-livereload')());
+  app.get('/:path/:file', redirectToDev);
+
+  console.log(__dirname);
+
+  app.get('/', (req, res) => {
+    const render = renderToString(<Root />);
+
+    res.status(200).send(render);
+  });
+
+
+  return app.listen(3003);
+};
+
+export default {
+  start
+};

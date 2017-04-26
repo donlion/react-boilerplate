@@ -17,6 +17,10 @@ import merge from 'merge-stream';
 import renderReact from 'gulp-render-react';
 import uglify from 'gulp-uglify';
 import insert from 'gulp-insert';
+import nodemon from 'nodemon';
+import babel from 'gulp-babel';
+// Modules
+import server from './src/server/index.js';
 
 /**
  * @name PROJECT
@@ -43,11 +47,11 @@ const SCRIPTS = {
 };
 
 /**
- * @name SERVER
+ * @name DEV_SERVER
  * @type {{src, dist: *}}
  */
-const SERVER = {
-    src: path.join(PATHS.src, 'server/*.js'),
+const DEV_SERVER = {
+    src: path.join(PATHS.src, 'server/dev.js'),
     dist: PATHS.dist
 };
 
@@ -153,12 +157,12 @@ gulp.task('scripts:watch', () => {
  * @name markup
  */
 gulp.task('markup', () => {
-    return gulp.src(SERVER.src, {read:false})
+    return gulp.src(DEV_SERVER.src, {read:false})
         .pipe(renderReact({
             type: 'string'
         }))
         .pipe(insert.prepend('<!doctype html>'))
-        .pipe(gulp.dest(SERVER.dist))
+        .pipe(gulp.dest(DEV_SERVER.dist))
         .pipe(connect.reload());
 });
 
@@ -195,12 +199,16 @@ gulp.task('server', () => {
     });
 });
 
+gulp.task('express', () => {
+  return server.start();
+});
+
 /**
  * @name watch
  */
 gulp.task('watch', ['_build'], cb => {
-    runSequence(['server', 'scripts:watch'], cb);
-    gulp.watch(SERVER.src, ['markup']);
+    runSequence(['server', 'express', 'scripts:watch'], cb);
+    gulp.watch(DEV_SERVER.src, ['markup']);
     gulp.watch(STYLES.watch, ['styles']);
     gulp.watch(STATIC.src, ['static']);
 });
