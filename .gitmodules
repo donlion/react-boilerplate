@@ -1,0 +1,3 @@
+[submodule "src/scripts/mobx-store"]
+	path = src/scripts/mobx-store
+	url = git@github.com:donlion/mobx-store.git
