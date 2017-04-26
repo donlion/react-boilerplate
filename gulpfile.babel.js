@@ -46,14 +46,6 @@ const SCRIPTS = {
     dist: path.join(PATHS.dist, 'js')
 };
 
-/**
- * @name DEV_SERVER
- * @type {{src, dist: *}}
- */
-const DEV_SERVER = {
-    src: path.join(PATHS.src, 'server/dev.js'),
-    dist: PATHS.dist
-};
 
 /**
  * @name STYLES
@@ -90,7 +82,11 @@ const compileScripts = (develop=false) => {
 
         bundle = () => {
             return bundler.bundle()
-                .on('error', function(err) { console.error(err); this.emit('end'); })
+                .on('error', error => {
+                    this.emit('end');
+
+                    return new gutil.PluginError('browserify', error);
+                })
                 .pipe(source('app.js'))
                 .pipe(buffer())
                 .pipe(sourcemaps.init({loadMaps: true}))
@@ -120,7 +116,11 @@ const compileScripts = (develop=false) => {
             connect.reload();
 
             return bundler.bundle()
-                .on('error', function(err) { console.error(err); this.emit('end'); })
+                .on('error', (err) => {
+                    this.emit('end');
+
+                    return new gutil.PluginError('browserify', error);
+                })
                 .pipe(source('app.js'))
                 .pipe(buffer())
                 .pipe(sourcemaps.init({loadMaps: true}))
@@ -154,19 +154,6 @@ gulp.task('scripts:watch', () => {
 });
 
 /**
- * @name markup
- */
-gulp.task('markup', () => {
-    return gulp.src(DEV_SERVER.src, {read:false})
-        .pipe(renderReact({
-            type: 'string'
-        }))
-        .pipe(insert.prepend('<!doctype html>'))
-        .pipe(gulp.dest(DEV_SERVER.dist))
-        .pipe(connect.reload());
-});
-
-/**
  * @name static
  */
 gulp.task('static', () => {
@@ -188,9 +175,9 @@ gulp.task('styles', function () {
 });
 
 /**
- * @name server
+ * @name livereload
  */
-gulp.task('server', () => {
+gulp.task('livereload', () => {
     return connect.server({
         name: PROJECT,
         root: PATHS.dist,
@@ -199,6 +186,9 @@ gulp.task('server', () => {
     });
 });
 
+/**
+ * @name express
+ */
 gulp.task('express', () => {
   return server.start();
 });
@@ -207,8 +197,7 @@ gulp.task('express', () => {
  * @name watch
  */
 gulp.task('watch', ['_build'], cb => {
-    runSequence(['server', 'express', 'scripts:watch'], cb);
-    gulp.watch(DEV_SERVER.src, ['markup']);
+    runSequence(['livereload', 'express', 'scripts:watch'], cb);
     gulp.watch(STYLES.watch, ['styles']);
     gulp.watch(STATIC.src, ['static']);
 });
@@ -216,7 +205,7 @@ gulp.task('watch', ['_build'], cb => {
 /**
  * @name _build
  */
-gulp.task('_build', cb => runSequence('clean', ['markup', 'styles', 'static'], cb));
+gulp.task('_build', cb => runSequence('clean', ['styles', 'static'], cb));
 
 /**
  * @name build
