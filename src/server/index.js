@@ -1,8 +1,10 @@
 import express from 'express';
 import React, {Component} from 'react';
 import {renderToString} from 'react-dom/server';
+import {match} from 'react-router';
 // Components
 import Root from '../scripts/components/Root';
+import routes from '../scripts/routes';
 
 export const start = () => {
   const app = express();
@@ -15,14 +17,22 @@ export const start = () => {
   app.use(require('connect-livereload')());
   app.get('/:path/:file', redirectToDev);
 
-  console.log(__dirname);
+  app.use((request, response) => {
+      match({
+          routes,
+          location: request.url
+      }, (error, redirectLocation, renderProps) => {
+          if (error) {
+              return response.status(500).send('Something did not work');
+          }
 
-  app.get('/', (req, res) => {
-    const render = renderToString(<Root />);
+          if (renderProps) {
+              const render = renderToString(<Root />);
 
-    res.status(200).send(render);
+              response.status(200).send(render);
+          }
+      });
   });
-
 
   return app.listen(3003);
 };
