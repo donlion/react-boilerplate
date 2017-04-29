@@ -7,6 +7,8 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 
 export default class Document extends Component {
     render() {
+        const {children} = this.props;
+
         return (
             <html lang="en">
             <head>
@@ -17,7 +19,7 @@ export default class Document extends Component {
             </head>
             <body>
             <div id="root">
-                <App />
+                {children || <App />}
             </div>
             <script src="/js/app.js" defer="defer" type="text/javascript"></script>
             </body>
