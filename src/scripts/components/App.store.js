@@ -4,10 +4,12 @@ import {
 } from 'mobx';
 
 export default class AppStore {
-    @observable title;
+    @observable title = 'Home';
 
     constructor(options={}) {
-        this.title = options.title || 'Home';
+        if (options.title) {
+            this.title = options.title;
+        }
     }
 
     @action updateTitle(title='') {

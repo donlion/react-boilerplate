@@ -6,10 +6,13 @@ import {observer} from 'mobx-react';
 import DevTools, {configureDevtool} from 'mobx-react-devtools';
 // Store
 import AppStore from './App.store.js';
-
-configureDevtool({
-    logEnabled: true
-});
+if (global.window) {
+    configureDevtool({
+        logEnabled: true
+    });
+}
+// Components
+import Post from './Post';
 
 @observer
 export default class App extends Component {
@@ -36,6 +39,9 @@ export default class App extends Component {
                     <DevTools />
                 )}
                 <h1>{title}</h1>
+
+                <Post query="dog" />
+                <Post query="cat" />
             </div>
         );
     }
