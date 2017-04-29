@@ -83,8 +83,6 @@ const compileScripts = (develop=false) => {
         bundle = () => {
             return bundler.bundle()
                 .on('error', error => {
-                    this.emit('end');
-
                     return new gutil.PluginError('browserify', error);
                 })
                 .pipe(source('app.js'))
@@ -117,8 +115,6 @@ const compileScripts = (develop=false) => {
 
             return bundler.bundle()
                 .on('error', (err) => {
-                    this.emit('end');
-
                     return new gutil.PluginError('browserify', error);
                 })
                 .pipe(source('app.js'))
