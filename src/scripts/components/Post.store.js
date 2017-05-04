@@ -24,9 +24,16 @@ export default class PostStore {
             return;
         }
 
+        const {id} = this;
+
         return request.get(`https://backend-api.tattoodo.com/api/search/posts?q=${query}&limit=1`)
             .then(response => {
                 let data = response ? get(response, 'data.data') : [];
+
+                if (!data) {
+                    return {};
+                }
+
                 this.post = data[0];
             })
             .catch(error => {

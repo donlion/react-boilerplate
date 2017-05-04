@@ -1,13 +1,17 @@
 import React, {Component} from 'react';
+import rehydrate from '../mobx-store/src/hydration/rehydrate';
 // Components
-import App from './App';
+import Route from '../routes.js';
 
 global.navigator = global.navigator || {};
 global.navigator.userAgent = global.navigator.userAgent || 'all';
 
-export default class Document extends Component {
+export default class Root extends Component {
     render() {
-        const {children} = this.props;
+        const {
+            children,
+            store
+        } = this.props;
 
         return (
             <html lang="en">
@@ -21,6 +25,13 @@ export default class Document extends Component {
             <div id="root">
                 {children || <App />}
             </div>
+            {store && (
+                <script
+                    type="text/javascript"
+                    dangerouslySetInnerHTML={{__html: `
+                        window._mobx_store = ${JSON.stringify(store)};`
+                    }} />
+            )}
             <script src="/js/app.js" defer="defer" type="text/javascript"></script>
             </body>
             </html>

@@ -3,20 +3,12 @@ import {observer} from 'mobx-react';
 // Store
 import PostStore from './Post.store.js';
 
-let ComponentCount = 0;
-
 @observer
-export class Post extends Component {
+export default class Post extends Component {
     constructor() {
         super();
 
-        this._id = `Post${ComponentCount}`;
-
-        ComponentCount++;
-
-        this.store = new PostStore({
-            id: this._id
-        });
+        this.store = new PostStore();
 
         this.fetchPost = this.fetchPost.bind(this);
     }
@@ -27,30 +19,21 @@ export class Post extends Component {
         fetchPost();
     }
 
+    static fetchData() {
+        return store.fetchPost(12488);
+    }
+
     /**
      * @name fetchPost
      * @return {Promise}
      */
-    fetchPost() {
+    fetchPost(_query) {
         const {
-            props: {
-                query
-            },
+            props: {query: propQuery},
             store
         } = this;
 
-        return store.fetchPost(query)
-            .then(() => {
-                setTimeout(() => {
-                    store.post.share_url = '';
-                    console.log('setting share_url');
-                }, 2000);
-
-                setTimeout(() => {
-                    store.post.image_url = 'http://placehold.it/420x420';
-                    console.log('setting image_url');
-                }, 4000);
-            });
+        return store.fetchPost(query);
     }
 
     render() {
@@ -58,8 +41,6 @@ export class Post extends Component {
             id,
             post
         } = this.store;
-
-        console.info('--- Render Component:', id);
 
         return (
             <section>
@@ -74,5 +55,3 @@ export class Post extends Component {
         );
     }
 }
-
-export default Post;

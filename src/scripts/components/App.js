@@ -2,17 +2,12 @@ import React, {
     Component
 } from 'react';
 import {observer} from 'mobx-react';
-// Devtool
-import DevTools, {configureDevtool} from 'mobx-react-devtools';
 // Store
 import AppStore from './App.store.js';
-if (global.window) {
-    configureDevtool({
-        logEnabled: true
-    });
-}
 // Components
 import Post from './Post';
+// Dev
+import DevTools from 'mobx-react-devtools';
 
 @observer
 export default class App extends Component {
@@ -23,21 +18,13 @@ export default class App extends Component {
             title: 'Homepage'
         });
     }
-
-    componentDidMount() {
-        setTimeout(() => {
-            this.store.updateTitle('Frontpage');
-        }, 2000);
-    }
-
+    
     render() {
         const {title} = this.store;
 
         return (
             <div>
-                {global.window && (
-                    <DevTools />
-                )}
+                {/*<DevTools />*/}
                 <h1>{title}</h1>
 
                 <Post query="dog" />

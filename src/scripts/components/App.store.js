@@ -4,7 +4,7 @@ import {
 } from 'mobx';
 
 export default class AppStore {
-    @observable title = 'Home';
+    @observable title = 'AppStore';
 
     constructor(options={}) {
         if (options.title) {

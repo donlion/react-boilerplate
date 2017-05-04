@@ -1,10 +1,12 @@
 import express from 'express';
 import React, {Component} from 'react';
 import {renderToString} from 'react-dom/server';
-import {match} from 'react-router';
+import {fetchData} from '../scripts/mobx-store/dist/index';
+import statusMonitor from 'express-status-monitor';
 // Components
-import Root from '../scripts/components/Root';
 import routes from '../scripts/routes';
+import Root from '../scripts/components/Root';
+import {Provider} from 'mobx-react';
 
 export const start = () => {
   const app = express();
@@ -16,9 +18,13 @@ export const start = () => {
   // Dev
   app.use(require('connect-livereload')());
   app.get('/:path/:file', redirectToDev);
+  app.use(statusMonitor());
 
   app.use((request, response) => {
-      match({
+      let match = require('react-router').match;
+      let RouterContext = require('react-router').RouterContext;
+
+      return match({
           routes,
           location: request.url
       }, (error, redirectLocation, renderProps) => {
@@ -26,11 +32,35 @@ export const start = () => {
               return response.status(500).send('Something did not work');
           }
 
-          if (renderProps) {
-              const render = renderToString(<Root />);
+          let initialStore = [];
 
-              response.status(200).send(render);
+          if (!renderProps) {
+              return response.status(500).send('SOMETHING WENT WRONG');
           }
+
+
+          let {
+              components,
+              params,
+              location: {query}
+          } = renderProps;
+
+          return fetchData({
+              store: initialStore,
+              components,
+              params,
+              query
+            })
+            .then(store => {
+                console.log('STORE');
+                console.log(store);
+                return renderToString(
+                    <Root store={store}>
+                        <RouterContext {...renderProps} />
+                    </Root>
+                );
+            })
+            .then(html => response.status(200).send(html));
       });
   });
 
