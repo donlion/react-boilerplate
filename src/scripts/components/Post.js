@@ -33,6 +33,12 @@ export default class Post extends Component {
             store
         } = this;
 
+        let query = _query || propQuery;
+
+        if (!query) {
+            return;
+        }
+
         return store.fetchPost(query);
     }
 

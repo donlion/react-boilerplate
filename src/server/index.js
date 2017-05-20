@@ -38,7 +38,6 @@ export const start = () => {
               return response.status(500).send('SOMETHING WENT WRONG');
           }
 
-
           let {
               components,
               params,
