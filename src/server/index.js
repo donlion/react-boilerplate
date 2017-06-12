@@ -54,7 +54,9 @@ export const start = () => {
                 console.log('STORE');
                 console.log(store);
                 return renderToString(
-                    <Root store={store}>
+                    <Root
+                        renderProps={renderProps}
+                        store={store}>
                         <RouterContext {...renderProps} />
                     </Root>
                 );

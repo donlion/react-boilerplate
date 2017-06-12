@@ -1,7 +1,8 @@
 import React, {
     Component
 } from 'react';
-import {observer} from 'mobx-react';
+import request from 'axios';
+import {connect} from '../mobx-store/dist/index';
 // Store
 import AppStore from './App.store.js';
 // Components
@@ -9,23 +10,23 @@ import Post from './Post';
 // Dev
 import DevTools from 'mobx-react-devtools';
 
-@observer
+@connect
 export default class App extends Component {
-    constructor() {
-        super();
-
-        this.store = new AppStore({
-            title: 'Homepage'
-        });
+    static fetchData() {
+        return request.get('http://google.com')
+            .catch(() => {})
+            .then(() => ({
+                visitedGoogle: 'yes'
+            }));
     }
-    
+
     render() {
-        const {title} = this.store;
+        const {store} = this.props;
 
         return (
             <div>
                 {/*<DevTools />*/}
-                <h1>{title}</h1>
+                {store && store.title && <h1>{store.title}</h1>}
 
                 <Post query="dog" />
                 <Post query="cat" />

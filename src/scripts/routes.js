@@ -14,12 +14,22 @@ export class RouteContainer extends Component {
     }
 }
 
+class Dummy extends Component {
+    render() {
+        return (<h1>Dummy</h1>);
+    }
+}
+
 export default (
     <Router history={browserHistory}>
         <Route path="/">
             <IndexRoute
                 name="home"
                 component={App} />
+
+            <Route
+                path="/dummy"
+                component={Dummy} />
         </Route>
     </Router>
 );

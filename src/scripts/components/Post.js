@@ -19,10 +19,6 @@ export default class Post extends Component {
         fetchPost();
     }
 
-    static fetchData() {
-        return store.fetchPost(12488);
-    }
-
     /**
      * @name fetchPost
      * @return {Promise}
