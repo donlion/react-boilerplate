@@ -19,6 +19,7 @@ import uglify from 'gulp-uglify';
 import insert from 'gulp-insert';
 import nodemon from 'nodemon';
 import babel from 'gulp-babel';
+import Promise from 'bluebird';
 // Modules
 import server from './src/server/index.js';
 
@@ -74,7 +75,13 @@ const compileScripts = (develop=false) => {
     let bundler = browserify(SCRIPTS.src, {
             debug: develop
         })
-        .transform('babelify');
+        .transform('babelify')
+        .transform('aliasify', {
+            aliases: {
+                'react': 'preact-compat',
+                'react-dom': 'preact-compat'
+            }
+        });
     let bundle;
 
     if (develop) {
@@ -83,9 +90,9 @@ const compileScripts = (develop=false) => {
         bundle = () => {
             return bundler.bundle()
                 .on('error', error => {
-                    this.emit('end');
+                    gutil.log('browserify', error);
 
-                    return new gutil.PluginError('browserify', error);
+                    return this.emit('end');
                 })
                 .pipe(source('app.js'))
                 .pipe(buffer())
@@ -116,10 +123,10 @@ const compileScripts = (develop=false) => {
             connect.reload();
 
             return bundler.bundle()
-                .on('error', (err) => {
-                    this.emit('end');
-
-                    return new gutil.PluginError('browserify', error);
+                .on('error', error => {
+                    gutil.log('browserify', error);
+                    
+                    return this.emit('end');
                 })
                 .pipe(source('app.js'))
                 .pipe(buffer())
@@ -201,6 +208,11 @@ gulp.task('watch', ['_build'], cb => {
     gulp.watch(STYLES.watch, ['styles']);
     gulp.watch(STATIC.src, ['static']);
 });
+
+/**
+ * @name dev
+ */
+gulp.task('dev', ['watch']);
 
 /**
  * @name _build

@@ -3,9 +3,25 @@ import React, {
 } from 'react';
 
 export default class App extends Component {
-  render() {
-      return (
-          <strong>Content</strong>
-      );
-  }
+    constructor() {
+        super();
+
+        this.state = {
+            renderer: 'server'
+        };
+    }
+
+    componentDidMount() {
+        this.setState({
+            renderer: 'client'
+        });
+    }
+
+    render() {
+        const {renderer} = this.state;
+
+        return (
+            <strong>Rendered by: {renderer}</strong>
+        );
+    }
 }
